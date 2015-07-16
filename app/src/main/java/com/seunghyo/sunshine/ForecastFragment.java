@@ -1,9 +1,11 @@
 package com.seunghyo.sunshine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
@@ -56,8 +58,7 @@ public class ForecastFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            FetchweatherTask weatherTask = new FetchweatherTask();
-            weatherTask.execute("Incheon");
+            updateWeather();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -69,21 +70,12 @@ public class ForecastFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ArrayList<String> weekForecast = new ArrayList<String>();
-
-        weekForecast.add("Today - Sunny - 88 / 63");
-        weekForecast.add("Tommorrow - Foggy - 70 / 46");
-        weekForecast.add("Weds - cloudy - 72 / 63");
-        weekForecast.add("Thurs - Rainy - 64 / 51");
-        weekForecast.add("Fri - Foggy - 70 / 46");
-        weekForecast.add("Sat - Sunny - 76 / 68");
-
         mForecastAdapter =
                 new ArrayAdapter<String>(
                         getActivity(),
                         R.layout.list_item_forecast,
                         R.id.list_item_forecast_textview,
-                        weekForecast);
+                        new ArrayList<String>());
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
@@ -98,6 +90,19 @@ public class ForecastFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    private  void updateWeather() {
+        FetchweatherTask weatherTask = new FetchweatherTask();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = prefs.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+        weatherTask.execute(location);
+    }
+
+    public void onStart() {
+        super.onStart();
+        updateWeather();
     }
 
     public class FetchweatherTask extends AsyncTask<String, Void, String[]> {
