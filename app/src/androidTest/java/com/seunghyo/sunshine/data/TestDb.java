@@ -126,7 +126,7 @@ public class TestDb extends AndroidTestCase {
                 null
         );
 
-        assertTrue( "Error: No records returned from location query", weatherCursor.moveToFirst());
+         assertTrue( "Error: No records returned from location query", weatherCursor.moveToFirst());
 
         TestUtilities.validateCurrentRecord("TestInsertReadDb weatherEntry failed to validate", weatherCursor, weatherValues);
 
